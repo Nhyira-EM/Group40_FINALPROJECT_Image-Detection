@@ -7,13 +7,12 @@ from PIL import Image
 
 # Load YOLO model
 model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
-with open(model_path, 'rb') as f:
-    final_model = torch.load(f)
+final_model = torch.load(model_path)
 
 def run_inference_and_annotate(image, model, confidence_threshold=0.5):
     # Convert PIL Image to OpenCV format (BGR)
-    image = np.array(image)
-    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    image_bgr = np.array(image)
+    image_bgr = cv2.cvtColor(image_bgr, cv2.COLOR_RGB2BGR)
 
     # Set the model to evaluation mode
     model.eval()
@@ -53,14 +52,12 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
 st.title("Webcam Object Detection with YOLO")
 
 # Button to start the webcam
-start_button = st.button("Start Webcam")
-
-if start_button:
-    st.write("Webcam is active. Click the 'Stop Webcam' button to end.")
+if st.button("Capture Image"):
     # Webcam input using Streamlit's camera input
     img = st.camera_input("Capture Image")
 
     if img:
+        st.write("Image captured. Processing...")
         # Convert image to PIL format
         image = Image.open(img)
 
@@ -69,3 +66,5 @@ if start_button:
 
         # Display the annotated image
         st.image(annotated_image, caption="Annotated Image")
+    else:
+        st.write("Please capture an image.")
