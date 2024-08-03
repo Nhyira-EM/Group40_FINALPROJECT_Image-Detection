@@ -35,7 +35,7 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
                     label = 'plastic'
 
             annotated_boxes.append((bbox, label, score))
-            detected_objects.append(label)  # Add label to detected objects list
+            detected_objects.append((label, score))  # Add label and score to detected objects list
 
     # Annotate the image
     for (bbox, label, score) in annotated_boxes:
@@ -69,6 +69,7 @@ if camera_input:
     # Display the types of objects detected
     if detected_objects:
         st.write("Objects detected:")
-        st.write(", ".join(set(detected_objects)))  # Display unique object types
+        for obj, score in detected_objects:
+            st.write(f"{obj}: {score:.2f}")
     else:
         st.write("No objects detected.")
