@@ -44,7 +44,7 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
     return image
 
 # Streamlit application
-st.title("Object Detection with YOLO")
+st.title("Object Detection with YOLO using Webcam")
 st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
 
 # Use Streamlit's camera input to capture images from the webcam
