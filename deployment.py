@@ -6,8 +6,8 @@ from PIL import Image
 from ultralytics import YOLO
 from huggingface_hub import hf_hub_download
 
-# Loading the YOLO model
-model_path = model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
+# Download and load the YOLO model
+model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
 model = YOLO(model_path)
 
 def run_inference_and_annotate(image, model, confidence_threshold=0.5):
@@ -16,7 +16,7 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
 
     # Run inference
     results = model(image_rgb)
-    
+
     # Process results
     annotated_boxes = []
     for result in results:
@@ -47,11 +47,12 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
 st.title("Object Detection with YOLO")
 st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+# Use Streamlit's camera input to capture images from the webcam
+camera_input = st.camera_input("Capture Image")
 
-if uploaded_file:
-    # Open and process the image
-    image = Image.open(uploaded_file)
+if camera_input:
+    # Convert the camera input to an image
+    image = Image.open(camera_input)
     image = np.array(image)  # Convert to numpy array
 
     # Run inference and annotate the image
