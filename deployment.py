@@ -19,6 +19,7 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
 
     # Process results
     annotated_boxes = []
+    detected_objects = []
     for result in results:
         boxes = result.boxes  # Extract bounding boxes and scores
         for box in boxes:
@@ -34,6 +35,7 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
                     label = 'plastic'
 
             annotated_boxes.append((bbox, label, score))
+            detected_objects.append(label)  # Add label to detected objects list
 
     # Annotate the image
     for (bbox, label, score) in annotated_boxes:
@@ -41,10 +43,10 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
         cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(image, f'{label} {score:.2f}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-    return image
+    return image, detected_objects
 
 # Streamlit application
-st.title("Object Detection with YOLO using Webcam")
+st.title("Object Detection with YOLO")
 st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
 
 # Use Streamlit's camera input to capture images from the webcam
@@ -56,10 +58,17 @@ if camera_input:
     image = np.array(image)  # Convert to numpy array
 
     # Run inference and annotate the image
-    annotated_image = run_inference_and_annotate(image, model)
+    annotated_image, detected_objects = run_inference_and_annotate(image, model)
 
     # Convert annotated image back to PIL format for Streamlit
     annotated_image_pil = Image.fromarray(annotated_image)
 
     # Display the image
     st.image(annotated_image_pil, caption='Annotated Image', use_column_width=True)
+
+    # Display the types of objects detected
+    if detected_objects:
+        st.write("Objects detected:")
+        st.write(", ".join(set(detected_objects)))  # Display unique object types
+    else:
+        st.write("No objects detected.")
