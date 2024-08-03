@@ -2,7 +2,8 @@ import streamlit as st
 import torch
 import numpy as np
 from PIL import Image
-from ultralytics import YOLO  # Ensure the correct package is used
+from ultralytics import YOLO
+from huggingface_hub import hf_hub_download
 
 # Loading the YOLO model
 model_path = model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
