@@ -1,26 +1,20 @@
 import streamlit as st
-import cv2
 import torch
 import numpy as np
-from huggingface_hub import hf_hub_download
 from PIL import Image
+from ultralytics import YOLO  # Ensure the correct package is used
 
-# Loading our custom YOLO model
-model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
-with open(model_path, 'rb') as f:
-    final_model = torch.load(f)
+# Loading the YOLO model
+model_path = model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
+model = YOLO(model_path)
 
 def run_inference_and_annotate(image, model, confidence_threshold=0.5):
     # Convert BGR to RGB for inference
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Set the model to evaluation mode
-    model.eval()
-
-    # Run inference with no gradient calculation
-    with torch.no_grad():
-        results = model(image_rgb)
-
+    # Run inference
+    results = model(image_rgb)
+    
     # Process results
     annotated_boxes = []
     for result in results:
@@ -59,7 +53,7 @@ if uploaded_file:
     image = np.array(image)  # Convert to numpy array
 
     # Run inference and annotate the image
-    annotated_image = run_inference_and_annotate(image, final_model)
+    annotated_image = run_inference_and_annotate(image, model)
 
     # Convert annotated image back to PIL format for Streamlit
     annotated_image_pil = Image.fromarray(annotated_image)
