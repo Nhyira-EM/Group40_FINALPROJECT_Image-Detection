@@ -67,9 +67,7 @@ if camera_input:
     st.image(annotated_image_pil, caption='Annotated Image', use_column_width=True)
 
     # Display the types of objects detected
-    if detected_objects:
-        st.write("Objects detected:")
-        for obj, score in detected_objects:
-            st.write(f"{obj}: {score:.2f}")
-    else:
-        st.write("No objects detected.")
+
+    st.write("Objects detected:")
+    for obj, score in detected_objects:
+        st.write(f"{obj}: {score:.2f}")
