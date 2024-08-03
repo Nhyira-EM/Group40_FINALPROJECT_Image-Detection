@@ -5,21 +5,21 @@ import numpy as np
 from huggingface_hub import hf_hub_download
 from PIL import Image
 
-# Load YOLO model
+# Loading our custom YOLO model
 model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
-final_model = torch.load(model_path)
+with open(model_path, 'rb') as f:
+    final_model = torch.load(f)
 
 def run_inference_and_annotate(image, model, confidence_threshold=0.5):
-    # Convert PIL Image to OpenCV format (BGR)
-    image_bgr = np.array(image)
-    image_bgr = cv2.cvtColor(image_bgr, cv2.COLOR_RGB2BGR)
+    # Convert BGR to RGB for inference
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Set the model to evaluation mode
     model.eval()
 
     # Run inference with no gradient calculation
     with torch.no_grad():
-        results = model(image_bgr)
+        results = model(image_rgb)
 
     # Process results
     annotated_boxes = []
@@ -42,29 +42,27 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
     # Annotate the image
     for (bbox, label, score) in annotated_boxes:
         x1, y1, x2, y2 = map(int, bbox)
-        cv2.rectangle(image_bgr, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        cv2.putText(image_bgr, f'{label} {score:.2f}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(image, f'{label} {score:.2f}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-    # Convert back to PIL Image for Streamlit
-    return Image.fromarray(cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB))
+    return image
 
 # Streamlit application
-st.title("Webcam Object Detection with YOLO")
+st.title("Object Detection with YOLO")
+st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
 
-# Button to start the webcam
-if st.button("Capture Image"):
-    # Webcam input using Streamlit's camera input
-    img = st.camera_input("Capture Image")
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-    if img:
-        st.write("Image captured. Processing...")
-        # Convert image to PIL format
-        image = Image.open(img)
+if uploaded_file:
+    # Open and process the image
+    image = Image.open(uploaded_file)
+    image = np.array(image)  # Convert to numpy array
 
-        # Run inference and annotate the image
-        annotated_image = run_inference_and_annotate(image, final_model)
+    # Run inference and annotate the image
+    annotated_image = run_inference_and_annotate(image, final_model)
 
-        # Display the annotated image
-        st.image(annotated_image, caption="Annotated Image")
-    else:
-        st.write("Please capture an image.")
+    # Convert annotated image back to PIL format for Streamlit
+    annotated_image_pil = Image.fromarray(annotated_image)
+
+    # Display the image
+    st.image(annotated_image_pil, caption='Annotated Image', use_column_width=True)
