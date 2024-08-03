@@ -1,6 +1,7 @@
 import streamlit as st
 import torch
 import numpy as np
+import cv2
 from PIL import Image
 from ultralytics import YOLO
 from huggingface_hub import hf_hub_download
