@@ -1,6 +1,7 @@
 import streamlit as st
 import torch
 import serial
+import serial.tools.list_ports
 import numpy as np
 import cv2
 from PIL import Image
@@ -8,21 +9,24 @@ from ultralytics import YOLO
 from huggingface_hub import hf_hub_download
 import time
 
+# List available COM ports
+ports = list(serial.tools.list_ports.comports())
+port_names = [port.device for port in ports]
+
 # Streamlit application
 st.title("Object Detection with YOLO")
 st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
 
-# Input for the serial port
-serial_port = st.text_input("Enter the serial port (e.g., COM8 for Windows or /dev/ttyUSB0 for Linux):", "COM8")
+# Select COM port
+selected_port = st.selectbox("Select COM Port", port_names)
 
-# Initialize the Arduino connection
-arduino = None
-if serial_port:
+# Initialize serial connection with error handling
+if selected_port:
     try:
-        arduino = serial.Serial(serial_port, 9600)
-        st.success(f"Connected to Arduino on {serial_port}")
+        arduino = serial.Serial(selected_port, 9600)
     except serial.SerialException as e:
-        st.error(f"Could not open serial port: {e}")
+        st.error(f"Could not open COM port: {e}")
+        arduino = None
 
 # Download and load the YOLO model
 model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
@@ -84,8 +88,10 @@ if camera_input:
     st.write("Objects detected:")
     for obj, score in detected_objects:
         st.write(f"{obj}: {score:.2f}")
+        # Send detected object type to Arduino if connection is successful
         if arduino:
             arduino.write(f"{obj}\n".encode())
 
+# Close the serial connection if it was opened
 if arduino:
     arduino.close()
