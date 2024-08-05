@@ -5,3 +5,4 @@ ultralytics
 numpy
 requests
 huggingface_hub
+pyserial
