@@ -8,7 +8,21 @@ from ultralytics import YOLO
 from huggingface_hub import hf_hub_download
 import time
 
-arduino = serial.Serial('COM8', 9600)
+# Streamlit application
+st.title("Object Detection with YOLO")
+st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
+
+# Input for the serial port
+serial_port = st.text_input("Enter the serial port (e.g., COM8 for Windows or /dev/ttyUSB0 for Linux):", "COM8")
+
+# Initialize the Arduino connection
+arduino = None
+if serial_port:
+    try:
+        arduino = serial.Serial(serial_port, 9600)
+        st.success(f"Connected to Arduino on {serial_port}")
+    except serial.SerialException as e:
+        st.error(f"Could not open serial port: {e}")
 
 # Download and load the YOLO model
 model_path = hf_hub_download(repo_id="Nhyira-EM/Objectdetection", filename="Imgdetec.pt")
@@ -49,10 +63,6 @@ def run_inference_and_annotate(image, model, confidence_threshold=0.5):
 
     return image, detected_objects
 
-# Streamlit application
-st.title("Object Detection with YOLO")
-st.write("Group 40: Francine Arthur & Emmanuel Nhyira Freduah-Agyemang")
-
 # Use Streamlit's camera input to capture images from the webcam
 camera_input = st.camera_input("Capture Image")
 
@@ -71,10 +81,11 @@ if camera_input:
     st.image(annotated_image_pil, caption='Annotated Image', use_column_width=True)
 
     # Display the types of objects detected
-
     st.write("Objects detected:")
     for obj, score in detected_objects:
         st.write(f"{obj}: {score:.2f}")
-        arduino.write(f"{obj}\n".encode())
+        if arduino:
+            arduino.write(f"{obj}\n".encode())
 
-arduino.close()
+if arduino:
+    arduino.close()
