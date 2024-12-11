@@ -7,16 +7,16 @@ import serial.tools.list_ports
 ports = list(serial.tools.list_ports.comports()) # List all available serial ports and get their information
 port_names = [port.device for port in ports]# Extract the device name (e.g., 'COM3', 'COM4') from each port
 portlist = [str(onePort) for onePort in ports]# Create a list of string representations of each port
-
+print(port_names)
 SerialInst = serial.Serial()# Initialize the serial communication instance
 SerialInst.baudrate = 9600# Set the baud rate for the serial communication
-SerialInst.port = port_names[0]# Assign the first available port to the serial instance (e.g., 'COM3')
+SerialInst.port = 'COM8'#port_names[0]# Assign the first available port to the serial instance (e.g., 'COM3')
 SerialInst.open()# Open the serial communication port
 
 print(port_names)# Print the list of available port names (for debugging or informational purposes)
 
 # Load the YOLO model
-model = YOLO("C:/Users/nhyir/Documents/INTRO TO AI/Group40_FINALPROJECT_Image-Detection/Imgdetec.pt")
+model = YOLO("C:/Users/nhyir/Documents/INTRO TO AI/Group40_FINALPROJECT_Image-Detection/Imgdetecv2.pt")
 
 while True:
     print('test')

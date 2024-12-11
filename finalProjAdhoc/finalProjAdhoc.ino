@@ -74,6 +74,7 @@ void loop() {
         digitalWrite(red_led, HIGH);
         digitalWrite(blue_led, HIGH);
         delay(500);
+        dropOther();
         digitalWrite(red_led, LOW);
         digitalWrite(blue_led, LOW);
       }
@@ -93,13 +94,17 @@ void pickWaste(){
 }
 
 void dropPlastic(){
-  defPos(180,120,40,40,25);
+  defPos(135,155,40,40,25);
   relWaste();
 }
 
 void dropMetal(){
-  defPos(135,120,40,40,25);
+  defPos(160,120,40,40,25);
   relWaste();
+}
+
+void dropOther(){
+  defPos(180,120,40,40,25);
 }
 
 void grabWaste(){
